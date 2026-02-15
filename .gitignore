@@ -1,4 +1,6 @@
 .conan_home/
+cmake/
+codex/
 build/
 build-test/
 build-no-viz/
