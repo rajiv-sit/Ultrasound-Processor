@@ -125,16 +125,7 @@ cmake --build build-viz --config Debug
 ## Figure / Video Placeholders
 
 ### Figure: Visualizer Main View
-<!-- Replace with your screenshot -->
-![Visualizer Main View](docs/figures/visualizer-main-view.png)
-
-### Figure: Detection Methods Overlay
-<!-- Replace with your screenshot -->
-![Detection Methods Overlay](docs/figures/visualizer-detection-methods.png)
-
-### Video: Replay Walkthrough
-<!-- Replace with your clip/link -->
-`[Add video link or embedded clip here]`
+<img width="1913" height="1021" alt="image" src="https://github.com/user-attachments/assets/18ee7996-d4ba-4c5c-b26b-36f4f00aaf17" />
 
 ## Quality Status
 - GoogleTest: `20/20` passing.
