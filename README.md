@@ -146,3 +146,6 @@ cmake --build build-viz --config Debug
 - Current release stage and commands: `codex/CURRENT_STAGE.md`
 - Release readiness/sign-off: `codex/RELEASE_READINESS.md`
 - Architecture/HLD/DD/FR/NFR: `codex/`
+
+## Further Info:
+  https://github.com/rajiv-sit/Ultrasound-Processor
