@@ -148,4 +148,4 @@ cmake --build build-viz --config Debug
 - Architecture/HLD/DD/FR/NFR: `codex/`
 
 ## Further Info:
-  https://github.com/rajiv-sit/Ultrasound-Processor
+ https://patents.justia.com/patent/20230417857
