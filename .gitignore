@@ -1,5 +1,4 @@
 .conan_home/
-cmake/
 codex/
 build/
 build-test/
