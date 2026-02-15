@@ -1,0 +1,583 @@
+Target Tracking Using USS Signal Ways
+Rajiv Sithiravel, Sivagnanam Sutharsan, Doug McEwan and David LaPorte
+
+Abstract
+Modern vehicles are equipped with various so-called “Driver Assistance Technologies” (DAT) to both aid the driver and
+enhance the safety of all passengers. Providing these technologies require the sensing vehicles to have an extensive perception
+of the vehicle’s surroundings. This insight is sensed via various sensing systems installed on the vehicle. One of the vital tasks
+of these sensing systems is the robust awareness of nearby obstacles. Whether in highway (high-speed) scenarios, or parking
+(slow-moving) scenarios, the sensing of obstacles must be performed precisely and quickly. Of particular interest in low-speed
+scenarios is the correct detection of “vulnerable road users” (VRUs) - i.e. pedestrians, cyclists, motorcyclists, which customarily
+has been a problematic issue in detection and tracking.
+Various types of sensing systems are used in DAT, including radar, camera, and ultrasonic sensing systems (USS). In this
+paper we use static range measurements from ultrasonic sensor “signal ways” to support VRU detection and tracking in lowspeed scenarios. The static range measurements are pre-processed using three methods: signal tracing (ST), intersection of signal
+fields-of-view (ISFOV) and intersection of ellipses (IE) to extract quasi measurements.
+The results show that in low-speed scenarios within five meters of a host vehicle, the three USS Signal Ways processing
+methods can be reliable means of resolving ambiguities in VRU tracking.
+
+Index Terms
+USS Signal Ways based tracking, pre-process USS Signal Ways, DAT features
+
+R.Sithiravel, S.Sutharsan, D.McEwan and D.LaPorte are with the Driver Assistance Technologies, Ford Motor Company, Dearborn, MI 48124, USA. e-mail:
+rsithira@ford.com, ssivagna@ford.com, dmcewan1@ford.com and dlaport8@ford.com
+
+1
+
+I. I NTRODUCTION
+Self-Driving Vehicles (SDV) support numerous driver assistance technologies (DAT) by perception of the surrounding using
+sensors. Due to the capability limitations of the internal sensors in the SDV paved a way to use exteroceptive sensors, which are
+sensors that create measurements from external sources i.e., radars, cameras, LiDARs and ultrasonic sensing systems (USS).
+Optical system-based sensors such as cameras and LiDARs are prune to weather. Radars compared to cameras and LiDARs
+very robust to bad weather, dust particles, vibration, and rough condition. Radars have the ability to measure the radial velocity
+instantly, which facilitates separation of moving and stationary environment. However, they usually carry disadvantages like
+interference problem and relatively low resolution in angles.
+Sound based sensor such as USS has been used in many areas including in SDV. USS performs well in slow moving
+application for example valet parking and remote parking. Unlike the radar which has low tendency to detect or track road
+vulnerable users (RVU) (explicitly targets that are very close to the sensing vehicles), the USS can detect and track RVU at
+close proximity. This issue becomes much worst for larger sensing vehicles (lorry, bus, train, tramp, and heavy vehicle) due
+to line of sight of the radars.
+However, LiDAR can be used to detect and track RVU at close proximity (up to 35 meters from the sensing vehicle), but
+currently LiDAR is used for ground truth purpose only and in term of marketability it is a very expensive unit. Also, this might
+be resolvable by using 360 degrees field of view (FOV) camera or surround cameras. Note, practically it is hard to mount the
+camera with 360 degrees FOV on sensing vehicles with line of sight of 360 degrees and also adding many cameras come with
+cost.
+While each sensing technology has its limitations and cost, the USS sensors are available in all the modern vehicles and
+they are cheap. Valeo provides USS signals, which contains static feature points (SFP), dynamic features (DF), signal ways
+(Sways), line marks and a grid map. The mission is here to see what signal can be used to detect and track nonstationary
+RVU. Line marks and grid map are out of the contest and SFP is not useful. DF is only available with the addition of a Valeo
+camera system, so we left with only SWays.
+The Sways are range-only measurements and can be monostatic, bistatic and multistatic. If the measurements are bistatic
+or multistatic then we can extract a pseudo measurement by solving multiple bistatic range observations. Measurements are
+computed based on signal tracing, intersection of ellipses (if there are more than one ultrasonic return) and intersections of
+FOVs. Results show that each method as well as a combination of methods can be used to detect VRUs within five meters of
+the USS sensor on the host vehicle.
+The overall Multisensor setup is described in Section (II). A detail description of the Valeo’s USS Signal Ways explained
+in Section (III). Finally, results and conclusions are given in Sections V and VI respectively.
+
+2
+
+II. S YSTEM OVERVIEW
+The vehicle used for testing and evaluation is displayed in Figure (1), and is equipped with five radars, five mono digital
+cameras, twelve ultrasonic sensors and a LiDAR sensor. Additional sensors are used to geolocate the vehicle. These include
+RT3000 (high precision GPS device) and inertial measurement units (IMUs). The vehicle has the capability to capture and
+store sensor measurements for later offline analysis and replay.
+
+Fig. 1. Sensor vehicle system overview
+
+A radar-tracking system developed by Aptiv provides object tracking results that are combined from two sub-trackers: one
+based on forward-looking radar and one based on a four-corner radar system (providing a 360-degree view of the vehicle’s
+environment). The front radar track results are fused with a forward-looking camera sensor from MobilEye which provides
+image-based tracking results. These front fused tracker results are further fused with the four corner radar tracker results.
+LiDAR point clouds are used as a ground truth validation tool. The accuracy of the LiDAR performance was validated in
+advance by using RT3000 range tests in a controlled environment (test track). There are six pairs of ultrasonic sensors, which
+track stationary and non-stationary objects during low-speed maneuvers. Additional mono cameras support various features.
+All the tests are performed with pre-calibrated sensors.
+
+III. U LTRASONIC M EASUREMENTS
+Ultrasonic measurements are obtainable from a Valeo sensing system which provides static feature points (SFP), dynamic
+features (DF), signal ways (SWays), line marks and a grid map. Up to 240 SFPs are provided, which are all stationary obstacles.
+The DF is only available with the addition of a Valeo camera system with up to ten dynamic objects provided. The Sways are
+range-only measurements and can be monostatic, bistatic and multistatic. The line marks are stationary information and the
+grid map provides a discretized occupancy map of the surrounding environment.
+3
+
+Note, the scope here is to track non-stationary vulnerable road users (VRUs). SFPs cannot be used since they only deal with
+stationary objects. DFs depend on Valeo’s camera and the data comes from Valeo’s camera or fused ultrasonic observations
+and camera. The line marks and grid map are out of scope here. Sways are range-only measurements which will be used to
+see how well they can be used for VRU tracking.
+
+IV. USS S IGNAL WAYS
+The ultrasonic’s Sways observations are range-only measurements and can be monostatic, bistatic and multistatic. There
+are maximum of 14 Signal-Ways. If the measurements are bistatic or multistatic then we can extract a pseudo measurement
+by solving multiple bistatic range observations. For simplicity, as shown in Figure (2) we only consider the front of the host
+vehicle. The possible signal ways pairs are described in Table (I).
+
+Fig. 2. Front USS Sensor Layout
+
+TABLE I
+S IGNAL WAYS PAIRS AT THE FRONT OF THE HOST
+
+Sensor ID
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+0
+
+(0,0)
+
+(0,1)
+
+–
+
+–
+
+–
+
+–
+
+1
+
+(1,0)
+
+(1,1)
+
+(1,2)
+
+–
+
+–
+
+–
+
+2
+
+–
+
+(2,1)
+
+(2,2)
+
+(2,3)
+
+–
+
+–
+
+3
+
+–
+
+–
+
+(3,2)
+
+(3,3)
+
+(3,4)
+
+–
+
+4
+
+–
+
+–
+
+–
+
+(4,3)
+
+(4,4)
+
+(4,5)
+
+5
+
+–
+
+–
+
+–
+
+–
+
+(5,4)
+
+(5,5)
+
+As shown in Table (I) the signal from USS Signal-Ways can be retraced. The USS sensors are calibrated and their locations
+and fields of view (FOVs) are known. One of the ways to compute the intersection is by solving ellipses whenever the
+4
+
+observation is bistatic or multistatic. Figure, (3) illustrates a technique normally used in active/passive radar applications,
+where the platform with emitter serially fires pulses and is observed by a receiver platform. The bistatic range measurement
+can be computed with:
+Rb =
+
+RT + RR
+2
+
+(1)
+
+where L, RT , RR and 2a are distance between sensor platforms, range between the emitter and target, range between target
+and receiver and the major axis. The major axis and minor axis Rb can be used to create ellipses. If the static measurements are
+bistatic or polystatic then we can create ellipses and solve for their intersections, which are the detections. The same principal
+applied in radar can be also applied for USS signal ways to compute the range and heading of detected objects. In addition,
+
+Fig. 3. Static measurement
+
+we can also compute the intersection by using FOV intersections. For monostatic only observations, traced information can be
+used as the intersection.
+Figure (4) depicts a case where a person is walking longitudinally toward the host vehicle. LiDAR, radar and RT3000 are
+used for performance validation. Here we only focus on the front of the host vehicle where one of the USS signals is transmitted
+and received by the same sensor (3). The location of the detections can be anywhere in the arc of sensor 3’s FOV. Another
+signal is transmitted by sensor 2 and received by sensor 3. The detections can be anywhere within the arc of the combined
+FOVs of sensor 2 and 3. Note, the same procedure can be applied to the rear of the host to extract pseudo measurements at
+the rear of the host vehicle.
+
+5
+
+Fig. 4. Signal Tracing and FOVs at the front of the host (Signal trace: gray lines, FOVs: pink pie, RT3000: white sphere, LiDAR: light-blue cloud, Radar’s
+detections: green dot, sensor locations: [0, · · · , 5], gating: gray circle)
+
+As shown in Figure (5) each USS signal can be traced, its longitudinally maximum travelled position is the detection. Some
+detections can come from noise. The signal tracing is related to the presence of non-stationary targets. A higher number of
+non-stationary tracks will result in a higher number of traced signals.
+
+Fig. 5. Intersections of signals tracking at the front of the host (Signal trace: gray lines, FOVs: pink pie, RT3000: white sphere, LiDAR: light-blue cloud,
+Radar’s detections: green dot, Sensor locations: [0, · · · , 5], detections: blue dots, gating: gray circle)
+
+6
+
+Using signal FOVs as shown in Figure (6) we can compute the intersection. The different between ellipse intersection and
+FOVs intersections is the way major and minor axis are determined. Later uses signal’s FOV or combined FOVs and the other
+follows the (3) radar’s technique.
+
+Fig. 6. Intersections of signals FOVs at the front of the host (Signal trace: gray lines, FOVs: pink pie, RT3000: white sphere, LiDAR: light-blue cloud,
+Radar’s detections: green dot, Sensor locations: [0, · · · , 5], detections: pink dots, gating: gray circle)
+
+Fig. 7. Intersection of ellipses at the front of the host (Signal trace: gray lines, FOVs: pink pie, RT3000: white sphere, LiDAR: light-blue cloud, Radar’s
+detections: green dot, Sensor locations: [0, · · · , 5], ellipse: green circle, detections: yellow dots, gating: gray circle)
+
+As shown in Figure (7) the detections can be computed whenever the observations are bistatic or multistatic. The performance
+accuracy is related to not only the ambiguities rooted within USS signal-ways, but also on the performance of the ellipse
+intersection algorithm. Some important possible ellipse configurations are represented in Figure (8). In this paper we do not
+go into detail regarding the ellipse intersection algorithm, but it is a difficult problem to solve and we have developed multiple
+versions of the algorithm.
+7
+
+Fig. 8. Possible ellipses configurations
+
+Figure (9) shows the collection of all the detections at one instant. The pink, yellow and blue dots represent the detections
+from signal FOVs, ellipse intersections and signal tracing, respectively. The total number of observations is a random occurrence
+and the detections can come from true-targets and false alarms (noise). Here, the point-source assumption doesn’t apply, and
+a single target can produce multiple detections. As shown in Figure (10), multiple detections can be clustered to compute the
+pseudo measurement.
+
+Fig. 9. Intersection from all the methods (Signal trace: gray lines, FOVs: pink pie, RT3000: white sphere, LiDAR: light-blue cloud, Radar’s detections: green
+dot, Sensor locations: [0, · · · , 5], detections from FOvs: pink dots, detections from intersection of ellipses: yellow dots, detections from signal tracking: blue
+dots, gating: gray circle)
+
+8
+
+Fig. 10. Fused processed detections (Signal trace: gray lines, FOVs: pink pie, RT3000: white sphere, LiDAR: light-blue cloud, Radar’s detections: green
+dot, Sensor locations: [0, · · · , 5], fused detections: red sphere, gating: gray circle)
+
+V. R ESULTS
+A feasibility study has been conducted to see whether USS Signal Ways can be used for detecting and tracking slow moving
+VRUs for use in parking lot based Driver Assistance features. As described in Section (II) the sensor platform senses the
+surrounding environment via six pairs of Valeo’s USS sensors. Note that LiDAR, cameras and RT3000, RT ranges and radars
+are used as ground truth sources. A number of test cases have been designed to study the outcome as shown in Section (V-A).
+
+A. Test cases:
+1) Case I:
+•
+
+Host vehicle is parked.
+
+•
+
+Place a cone at the front of the host vehicle on the right side.
+
+•
+
+Place it at 2m – 10m (longitudinally varying) from the front bumper of the host.
+
+•
+
+From the center of the bumper varies the cone position laterally (1m – 9m).
+
+2) Case II:
+•
+
+Host vehicle is parked.
+
+•
+
+Place a cone at the front of the host vehicle on the left side.
+
+•
+
+Place it at 2m – 10m (longitudinally varying) from the front bumper of the host.
+
+•
+
+From the center of the bumper varies the cone position laterally (1m – 9m).
+
+3) case III:
+•
+
+Host vehicle is parked.
+
+•
+
+A moving walker.
+
+•
+
+Moving parallel to the front bumper from varying longitudinal distance.
+9
+
+•
+
+Moving vertical to the front bumper from varying lateral distance.
+
+•
+
+Moving with varying speed.
+
+4) case IV:
+•
+
+Host vehicle is parked.
+
+•
+
+A moving walker.
+
+•
+
+Moving parallel to the front bumper from varying longitudinal distance.
+
+•
+
+Moving vertical to the front bumper from varying lateral distance.
+
+•
+
+Place a cone at the right side of the host with varying longitudinal and lateral distance.
+
+5) Case V:
+•
+
+Host vehicle is parked.
+
+•
+
+A moving walker.
+
+•
+
+Moving parallel to the front bumper from varying longitudinal distance.
+
+•
+
+Moving vertical to the front bumper from varying lateral distance.
+
+•
+
+Place a cone at the left side of the host with varying longitudinal and lateral distance.
+
+6) Case VI:
+•
+
+Host vehicle is parked.
+
+•
+
+2 or more (max 5) moving walkers.
+
+•
+
+Moving parallel to the front bumper from varying longitudinal distance.
+
+•
+
+Moving vertical to the front bumper from varying lateral distance.
+
+Data has been collected at the parking lot of Building 2 at the Ford Dearborn Product Development Campus. This was during
+a winter month and the parking lot was empty of other vehicles. There were a lot of tests conducted and studied, but the main
+focus applied to cases 4 − 6. The host vehicle had LiDAR, RT3000, RT ranges and cameras for ground truth purpose. Test
+subjects ground truths were also collected using RT-range instruments. As performance validation a gating around obstacle’s
+RT ranges were put in place i.e., 0.5m. Any detections that fell inside the gating area are considered a valid detection.
+Root mean squared error (RMSE) values were computed to validate the algorithm’s performance. As shown in Figures (V-B)
+and V-C) the results were analyzed visually and quantitatively, where on the left side of the figures longitudinal and lateral
+position of detections along with ground truth, position RMSE and number of detections information are available for validation.
+On the right a visualization shows information regarding the host’s internal and external environment. The remaining are a
+camera view of the test subject, some performance validation parameter interfaces, and results of the algorithm.
+
+10
+
+B. Single target
+In this case a sensor platform was parked at the parking lot throughout the testing and a pedestrian moved horizontally and
+vertically in front of the sensor platform. Also, for both cases a stationary object was placed either to the right or left side of
+the host vehicle. For nearly all of the test cases the algorithm was unable to detect the stationary objects.
+As shown in Figure (11) a pedestrian walked in front of the host longitudinally back and forth. The longitudinal position
+(brown line) matched with the RT ground truth (blue line) and the lateral position (brown line) deviated slightly from the ground
+truth (blue line), but the overall position RMSE (yellow line) is below 0.30 meters. As the test subjects approached toward the
+host the number of detections (green line) increased, where the white line refers to the extracted number of detections. Within
+five meters from the front of the host bumper the algorithm worked very well. During the testing out of a total of 807 scans
+there were 175 missed detections and the average position RMSE was 0.26022 meters.
+
+Fig. 11. Walking longitudinally in front of host
+
+In the next test as shown in Figure (12) the VRUs walked laterally in front of the host at specific longitudinal positions
+from one end to other. As with the first case, the host vehicle was parked throughout the test. Ground truth from host and
+VRU were collected. As show in Figure (12) the lateral position (brown line) matched with RT ground truth (blue line) and
+longitudinal position (brown line) deviated somewhat from the truth (blue line), but the overall RMSE (yellow line) is below
+0.30 meters. As the test subjects approached toward the host the number of detections (green line) increased, where the white
+line refers to the extracted number of detections. Again, as in the previous case, within five meters of the front of the host
+bumper the algorithm worked very well. From a total of 745 scans there were 494 missed detections and the average position
+RMSE was 0.266839 meters.
+
+11
+
+Fig. 12. Walking laterally in front of host
+
+C. Multitarget
+Tests were also conducted with more than two VRUs. During all of the tests there was a stationary obstacle either to the
+right or left side of the host. The host vehicle was parked throughout the test and the platform sensed the environment using
+radars, LiDAR, cameras, RT ranges and RT3000. Other than USS sensors the rest were used for ground truth purposes. The
+VRU test subjects’ locations were collected using RT-Range instruments. As in the single target cases, test subjects moved
+longitudinally or laterally in front of the host vehicle. Performance analyses were taken with respect to a single target due to
+closely spaced target ambiguities.
+As shown in Figures (13) and (14) both VRUs were walking back and forth in front of the host in different lateral positions.
+As shown in both figures longitudinal position (brown lines) matched with RT ground truth (blue or red line) and lateral position
+(brown lines) deviated somewhat from the truth (blue or red line), but the overall RMSE (yellow line) is below a desired 0.30
+meter threshold. As the test subjects approached toward the host the number of detections (green line) were increased, where
+the white line refers to the extracted number of detections. Within five meters from the front of the host bumper the algorithm
+worked very well.
+Next, as like the single target scenario two VRUs walked laterally in front of the host at specific longitudinal positions from
+one side to the other. Ground truth from the host vehicle and VRUs were collected.
+As show in Figure (15) and (16) both VRU’s lateral positions (brown lines) matched with RT ground truth positions (blue or
+red line) and longitudinal positions (brown lines) deviated somewhat from the ground truth (blue or red line), but the overall
+RMSEs (yellow lines) are within the 0.30 meter threshold. As the VRUs approached toward the host the number of detections
+(green lines) were increased, where the white lines are referred to the extracted number of detections.
+12
+
+Fig. 13. Walking longitudinally in front of host (first target)
+
+Fig. 14. Walking longitudinally in front of host (second target)
+
+13
+
+Fig. 15. Walking laterally in front of host (first target)
+
+Fig. 16. Walking laterally in front of host (second target)
+
+14
+
+Finally, the performance of signal tracing, detection from intersection of ellipses and detections from intersections of FOVs
+were analyzed for the non-stationary single target case.
+As shown in Tables (II) and (III) the performance of signal tracing, ellipse and FOVs intersection method were quantitatively
+analyzed for a single target cases. The first test was related to Case IV (walking in front of the host back and forth
+longitudinally). As shown in the table, missed detections and average position RMSE were used as performance metrics.
+All of the implementation methods performed well in terms of positional RMSE, but fused results had the lowest RMSE. By
+fusing the results further can improve the detections by removing uncertainties. The importance of the signal tracing method
+is reflected in the results. Note, we do not always have bistatic or multistatic range measurements and even if there are bistatic
+or multistatic signals, no intersections mean no detections. Signal tracing provides valuable information when we do not detect
+any intersections. Because the ellipse intersection method and signal FOV method deal with different geometric coordinates,
+they have different levels of performance accuracy.
+TABLE II
+P ERFORMANCE : WALK VERTICALLY IN FRONT OF THE HOST
+
+CASE IV
+
+Signal Tracing Method
+
+Detection from signals FOV
+
+Intersection of Ellipses
+
+Fused
+
+Missed Detections
+
+69
+
+62
+
+33
+
+60
+
+Total Scans
+
+319
+
+151
+
+93
+
+311
+
+0.259475
+
+0.255823
+
+0.277137
+
+0.252181 m
+
+Average Position RMSE m
+
+Table (III) deals with Case V where a single target moved laterally in front of the host from side to side at a specific
+longitudinal position. The ellipse intersection method provided a lower positional RMSE than the rest of the methods including
+the fused/clustered method. Note, the signal tracing method has the highest RMSE and also has the most missed detections.
+TABLE III
+P ERFORMANCE : WALK HORIZONTALLY IN FRONT OF THE HOST
+
+CASE V
+
+Signal Tracing Method
+
+Detection from signals FOV
+
+Intersection of Ellipses
+
+Fused
+
+Missed Detections
+
+341
+
+71
+
+73
+
+342
+
+Total Scans
+
+500
+
+140
+
+143
+
+493
+
+0.261534
+
+0.22807
+
+0.214079
+
+0.259315
+
+Average Position RMSE m
+
+15
+
+VI. C ONCLUSIONS
+This initiative has taken place to support/enhance the use of USS Signal Ways in VRU detection and ultimately VRU
+avoidance. The focus of this study was at the front of the host vehicle, but similar methods can be applied to the rear as
+well. The monostatic, bistatic, and multistatic range information from USS Signal Way’s data was used to compute detection
+pseudo measurements. These post processed measurements can be used for VRU tracking purposes. Observations are computed
+based on signal tracing, intersection of ellipses (if there are more than one ultrasonic return) and intersections of FOVs. The
+algorithm can provide fused detections and clustered fused detections. Results show that each method as well as a combination
+of methods can be used to detect VRUs within five meters of the USS sensor on the host vehicle.
+
+16
+
+
